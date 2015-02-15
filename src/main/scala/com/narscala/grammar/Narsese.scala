@@ -1,30 +1,44 @@
 package com.narscala.grammar
 
-import scala.util.parsing.combinator._
+import org.parboiled2._
 
-class Narsese extends JavaTokenParsers with PackratParsers {
+class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     /*
     Non-Axiomatic Logic: A Model of Intelligent Reasoning (2013)
     pg. 218, Table A.1
 
     https://code.google.com/p/open-nars/wiki/InputOutputFormat
 
-    TODO: Stackoverflow on unicode characters? i.e <请核对 --> 请核对>.
-    TODO: Stackoverflow on $ ?
+    TODO: Fix Recursion on Term
     */
+    import CharPredicate.{Digit}
 
-    def task : Parser[Any] = opt(budget)~sentence                       // task to be processed
+    def InputLine = rule { Task ~ optional("\n") ~ EOI }
 
-    def sentence : Parser[Any] = statement~"."~opt(tense)~opt(truth) |  // judgment to be remembered, NAL-8
-            statement~"?"~opt(tense) |                                  // question to be answered, NAL-8
-            statement~"@"~opt(tense) |                                  // question on desire value to be answered, NAL-8
-            statement~"!"~opt(truth)                                    // goal to be realized, NAL-8
+    // Helper Rules
+    implicit def wspStr(s: String): Rule0 = rule { str(s) ~ zeroOrMore(' ') }
+    def Flt = rule { Digits ~ Dec }
+    def Digits = rule { oneOrMore(Digit) }
+    def Dec = rule { str(".") ~ Digits }
 
-    def statement : Parser[Any] = "<"~term~copula~term~">" |            // two terms related to each other
-            term |                                                      // a term can name a statement
-            "(^"~word~rep(","~term)~")"                                 // an operation to be executed  
+    // Grammar
+    def Task = rule { optional(Budget) ~ Sentence }
 
-    def copula : Parser[Any] = "-->" |                                  // inheritance, NAL-1
+    def Sentence = rule {
+        Statement ~ "." ~ optional(Tense) ~ optional(Truth) |
+        Statement ~ "?" ~ optional(Tense) |
+        Statement ~ "@" ~ optional(Tense) |
+        Statement ~ "!" ~ optional(Truth)
+    }
+
+    def Statement = rule { 
+         "<" ~ Term ~ Copula ~ Term ~ ">" |
+         Term  |
+         "(^" ~ Word ~ oneOrMore(Term).separatedBy(",") ~ ")"
+    }
+
+    def Copula = rule {
+            "-->"  |                                                    // inheritance, NAL-1
             "<->"  |                                                    // similarity, NAL-2
             "{--"  |                                                    // instance, NAL-2
             "--]"  |                                                    // property, NAL-2
@@ -35,43 +49,59 @@ class Narsese extends JavaTokenParsers with PackratParsers {
             "=|>"  |                                                    // concurrent implication, NAL-7
             "=\\>" |                                                    // retrospective implication, NAL-7
             "</>"  |                                                    // predictive equivalence, NAL-7
-            "<|>"                                                       // concurrent equivalence, NAL-7
+            "<|>"
+    }
 
-    def term : Parser[Any] = word |                                     // an atomic constant term
-            variable     |                                              // an atomic variable term
-            compoundterm |                                              // a term with internal structure
-            statement                                                   // a statement can serve as a term
+    def Term:Rule0 = rule {
+        Word         |                                                  // an atomic constant term
+        Variable     |                                                  // an atomic variable term
+        CompoundTerm |                                                  // a term with internal structure
+        Statement                                                      // a statement can serve as a term
+    }
 
-    def compoundterm : Parser[Any] = "{"~term~rep(","~term)~"}" |       // extensional set, NAL-2
-            "["~term~rep(","~term)~"]"   |                              // intensional set, NAL-2
-            "(&,"~term~rep(","~term)~")" |                              // extensional intersection, NAL-3
-            "(|,"~term~rep(","~term)~")" |                              // intensional intersection, NAL-3
-            "(-,"~term~","~term~")"   |                                 // extensional difference, NAL-3
-            "(~,"~term~","~term~")"   |                                 // intensional difference, NAL-3
-            "(*,"~term~rep(","~term)~")" |                              // product, NAL-4
-            "(/,"~term~rep(","~term)~")" |                              // extensional image, NAL-4
-            "(\\,"~term~rep(","~term)~")"|                              // intensional image, NAL-4
-            "(--,"~term~")"           |                                 // negation, NAL-5
-            "(||,"~term~rep(","~term)~")"|                              // disjunction, NAL-5
-            "(&&,"~term~rep(","~term)~")"|                              // conjunction, NAL-5
-            "(&/,"~term~rep(","~term)~")"|                              // sequential events/conjunction, NAL-7
-            "(&|,"~term~rep(","~term)~")"                               // parallel events/conjunciton, NAL-7
+    def CompoundTerm = rule {
+        "{"   ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ "}" |
+        "["   ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ "]" |
+        "(&,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(|,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "-,"   ~ Term ~ "," ~ Term ~ ")" |
+        "~,"   ~ Term ~ "," ~ Term ~ ")" |
+        "(*,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(/,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(\\," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(--," ~ Term ~ ")" |
+        "(||," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(&&," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(&/," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
+        "(&|," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" 
+    }
 
-    def variable : Parser[Any] = "$$"~word |                             // independent variable / variable in judgment(?), NAL-6
-            "#"~opt(word) |                                             // dependent variable, operator(?), NAL-8
-            "?"~opt(word)                                               // query variable in question, NAL-6
+    def Variable = rule {
+        "$" ~ Word |
+        "#" ~ Word |
+        "?" ~ Word 
+    }
 
-    def tense : Parser[Any] = ":/:" |                                   // future event, NAL-7
-            ":|:" |                                                     // present event, NAL-7
-            ":\\:"                                                      // past event, NAL-7
+    def Tense = rule {
+        ":/:" |
+        ":|:" |
+        ":\\:"
+    }
 
-    def truth : Parser[Any] = "%"~frequency~opt(";"~confidence)~"%"     // two numbers in [0,1]x(0,1)
-    def budget : Parser[Any] = "$$"~priority~opt(";"~durability)~"$$"     // two numbers in [0,1]x(0,1)
-    def word : Parser[String] = """\w+""".r ^^ { _.toString }
+    def Truth = rule {
+        "%" ~ Frequency ~ optional(";" ~ Confidence) ~ "%"
+    }
 
-    def frequency : Parser[Double] = """(0(\.\d+)?|1(\.0+)?)""".r ^^ { _.toDouble }
-    def confidence : Parser[Double] = """(0(\.\d+)?|1(\.0+)?)""".r ^^ { _.toDouble }
-    def priority : Parser[Double] = """(0(\.\d+)?|1(\.0+)?)""".r ^^ { _.toDouble }
-    def durability : Parser[Double] = """(0(\.\d+)?|1(\.0+)?)""".r ^^ { _.toDouble }
+    def Budget = rule {
+        "$" ~ Priority ~ optional(";" ~ Durability) ~ "$"
+    }
 
+    def Word = rule {
+        oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n"))
+    }
+
+    def Frequency = rule { Flt }
+    def Confidence = rule { Flt }
+    def Priority = rule { Flt }
+    def Durability = rule { Flt }
 }
