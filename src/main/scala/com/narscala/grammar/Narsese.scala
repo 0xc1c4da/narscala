@@ -57,7 +57,7 @@ class Narsese extends JavaTokenParsers with PackratParsers {
             "(&/,"~term~rep(","~term)~")"|                              // sequential events/conjunction, NAL-7
             "(&|,"~term~rep(","~term)~")"                               // parallel events/conjunciton, NAL-7
 
-    def variable : Parser[Any] = "$"~word |                             // independent variable / variable in judgment(?), NAL-6
+    def variable : Parser[Any] = "$$"~word |                             // independent variable / variable in judgment(?), NAL-6
             "#"~opt(word) |                                             // dependent variable, operator(?), NAL-8
             "?"~opt(word)                                               // query variable in question, NAL-6
 
@@ -66,7 +66,7 @@ class Narsese extends JavaTokenParsers with PackratParsers {
             ":\\:"                                                      // past event, NAL-7
 
     def truth : Parser[Any] = "%"~frequency~opt(";"~confidence)~"%"     // two numbers in [0,1]x(0,1)
-    def budget : Parser[Any] = "$"~priority~opt(";"~durability)~"$"     // two numbers in [0,1]x(0,1)
+    def budget : Parser[Any] = "$$"~priority~opt(";"~durability)~"$$"     // two numbers in [0,1]x(0,1)
     def word : Parser[String] = """\w+""".r ^^ { _.toString }
 
     def frequency : Parser[Double] = """(0(\.\d+)?|1(\.0+)?)""".r ^^ { _.toDouble }
