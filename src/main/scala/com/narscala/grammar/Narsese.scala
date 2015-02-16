@@ -16,7 +16,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def InputLine = rule { oneOrMore(Task) ~ EOI }
 
     // Helper Rules
-    implicit def wspStr(s: String): Rule0 = rule { str(s) ~ zeroOrMore(' ') }
+    implicit def wspStr(s: String): Rule0 = rule { zeroOrMore(' ') ~ str(s) ~ zeroOrMore(' ') }
     def Num = rule { Digits ~ optional(Dec) }
     def Digits = rule { oneOrMore(Digit) }
     def Dec = rule { str(".") ~ Digits }
