@@ -60,20 +60,25 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def CompoundTerm = rule {
-        "{"    ~ oneOrMore(Term).separatedBy(",") ~ "}" |               // extensional set, NAL-2
-        "["    ~ oneOrMore(Term).separatedBy(",") ~ "]" |               // intensional set, NAL-2
-        "(&,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // extensional intersection, NAL-3
-        "(|,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // intensional intersection, NAL-3
-        "-,"   ~ Term ~ "," ~ Term ~ ")" |                              // extensional difference, NAL-3
-        "~,"   ~ Term ~ "," ~ Term ~ ")" |                              // intensional difference, NAL-3
-        "(*,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // product, NAL-4
-        "(/,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // extensional image, NAL-4
-        "(\\," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // intensional image, NAL-4
-        "(--," ~ Term ~ ")" |                                           // negation, NAL-5
-        "(||," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // disjunction, NAL-5
-        "(&&," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // conjunction, NAL-5
-        "(&/," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // sequential events/conjunction, NAL-7
-        "(&|," ~ oneOrMore(Term).separatedBy(",") ~ ")"                 // parallel events/conjunciton, NAL-7
+        "{" ~ oneOrMore(Term).separatedBy(",") ~ "}" |               // extensional set, NAL-2
+        "[" ~ oneOrMore(Term).separatedBy(",") ~ "]" |               // intensional set, NAL-2
+        "(" ~ optional(Op) ~ optional(",") ~ oneOrMore(Term).separatedBy(Op) ~ ")"
+    }
+
+    def Op = rule {
+        "&" |                                                           // extensional intersection, NAL-3
+        "|" |                                                           // intensional intersection, NAL-3
+        "-" |                                                           // extensional difference, NAL-3
+        "~" |                                                           // intensional difference, NAL-3
+        "*" |                                                           // product, NAL-4
+        "/" |                                                           // extensional image, NAL-4
+        "\\"|                                                           // intensional image, NAL-4
+        "--"|                                                           // negation, NAL-5
+        "||"|                                                           // disjunction, NAL-5
+        "&&"|                                                           // conjunction, NAL-5
+        "&/"|                                                           // sequential events/conjunction, NAL-7
+        "&|"|                                                           // parallel events/conjunciton, NAL-7
+        ","                                                             // seperator
     }
 
     def Variable = rule {                                               
