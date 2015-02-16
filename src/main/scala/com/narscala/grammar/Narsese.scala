@@ -13,7 +13,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     */
     import CharPredicate.{Digit}
 
-    def InputLine = rule { Task ~ optional("\n") ~ EOI }
+    def InputLine = rule { oneOrMore(Task) ~ EOI }
 
     // Helper Rules
     implicit def wspStr(s: String): Rule0 = rule { str(s) ~ zeroOrMore(' ') }
@@ -22,19 +22,19 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def Dec = rule { str(".") ~ Digits }
 
     // Grammar
-    def Task = rule { optional(Budget) ~ Sentence }
+    def Task = rule { optional(Budget) ~ Sentence ~ optional("\n") }    // task to be processed
 
-    def Sentence = rule {
-        Statement ~ "." ~ optional(Tense) ~ optional(Truth) |
-        Statement ~ "?" ~ optional(Tense) |
-        Statement ~ "@" ~ optional(Tense) |
-        Statement ~ "!" ~ optional(Truth)
+    def Sentence = rule {                                               
+        Statement ~ "." ~ optional(Tense) ~ optional(Truth) |           // judgment to be remembered, NAL-8
+        Statement ~ "?" ~ optional(Tense) |                             // question to be answered, NAL-8
+        Statement ~ "@" ~ optional(Tense) |                             // question on desire value to be answered, NAL-8
+        Statement ~ "!" ~ optional(Truth)                               // goal to be realized, NAL-8
     }
 
     def Statement = rule { 
-         "<" ~ Term ~ Copula ~ Term ~ ">" |
-         Term  |
-         "(^" ~ Word ~ oneOrMore(Term).separatedBy(",") ~ ")"
+         "<" ~ Term ~ Copula ~ Term ~ ">" |                             // two terms related to each other
+         Term  |                                                        // a term can name a statement
+         "(^" ~ Word ~ oneOrMore(Term).separatedBy(",") ~ ")"           // an operation to be executed 
     }
 
     def Copula = rule {
@@ -56,48 +56,48 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         Word         |                                                  // an atomic constant term
         Variable     |                                                  // an atomic variable term
         CompoundTerm |                                                  // a term with internal structure
-        Statement                                                      // a statement can serve as a term
+        Statement                                                       // a statement can serve as a term
     }
 
     def CompoundTerm = rule {
-        "{"   ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ "}" |
-        "["   ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ "]" |
-        "(&,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(|,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "-,"   ~ Term ~ "," ~ Term ~ ")" |
-        "~,"   ~ Term ~ "," ~ Term ~ ")" |
-        "(*,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(/,"  ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(\\," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(--," ~ Term ~ ")" |
-        "(||," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(&&," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(&/," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" |
-        "(&|," ~ Term ~ zeroOrMore(Term).separatedBy(",") ~ ")" 
+        "{"    ~ oneOrMore(Term).separatedBy(",") ~ "}" |               // extensional set, NAL-2
+        "["    ~ oneOrMore(Term).separatedBy(",") ~ "]" |               // intensional set, NAL-2
+        "(&,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // extensional intersection, NAL-3
+        "(|,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // intensional intersection, NAL-3
+        "-,"   ~ Term ~ "," ~ Term ~ ")" |                              // extensional difference, NAL-3
+        "~,"   ~ Term ~ "," ~ Term ~ ")" |                              // intensional difference, NAL-3
+        "(*,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // product, NAL-4
+        "(/,"  ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // extensional image, NAL-4
+        "(\\," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // intensional image, NAL-4
+        "(--," ~ Term ~ ")" |                                           // negation, NAL-5
+        "(||," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // disjunction, NAL-5
+        "(&&," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // conjunction, NAL-5
+        "(&/," ~ oneOrMore(Term).separatedBy(",") ~ ")" |               // sequential events/conjunction, NAL-7
+        "(&|," ~ oneOrMore(Term).separatedBy(",") ~ ")"                 // parallel events/conjunciton, NAL-7
     }
 
-    def Variable = rule {
-        "$" ~ Word |
-        "#" ~ Word |
-        "?" ~ Word 
+    def Variable = rule {                                               
+        "$" ~ Word |                                                    // independent variable / variable in judgment(?), NAL-6
+        "#" ~ Word |                                                    // dependent variable, operator(?), NAL-8
+        "?" ~ Word                                                      // query variable in question, NAL-6
     }
 
     def Tense = rule {
-        ":/:" |
-        ":|:" |
-        ":\\:"
+        ":/:" |                                                         // future event, NAL-7
+        ":|:" |                                                         // present event, NAL-7
+        ":\\:"                                                          // past event, NAL-7
     }
 
     def Truth = rule {
-        "%" ~ Frequency ~ optional(";" ~ Confidence) ~ "%"
+        "%" ~ Frequency ~ optional(";" ~ Confidence) ~ "%"              // two numbers in [0,1]x(0,1)
     }
 
     def Budget = rule {
-        "$" ~ Priority ~ optional(";" ~ Durability) ~ "$"
+        "$" ~ Priority ~ optional(";" ~ Durability) ~ "$"               // two numbers in [0,1]x(0,1)
     }
 
     def Word = rule {
-        oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n"))
+        oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n'\" "))                  // Anything apart from chars used in grammar
     }
 
     def Frequency = rule { Flt }
