@@ -62,7 +62,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def CompoundTerm = rule {
         "{" ~ oneOrMore(Term).separatedBy(",") ~ "}" |                  // extensional set, NAL-2
         "[" ~ oneOrMore(Term).separatedBy(",") ~ "]" |                  // intensional set, NAL-2
-        "(" ~ optional(Op ~ ",") ~ oneOrMore(Term).separatedBy(zeroOrMore(' ') ~ Op ~ zeroOrMore(' ')) ~ ")"// See Op
+        "(" ~ optional(Op ~ ",") ~ oneOrMore(Term).separatedBy(Op) ~ ")"// See Op
     }
 
     def Op = rule {
