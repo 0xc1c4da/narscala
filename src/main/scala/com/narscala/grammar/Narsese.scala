@@ -33,7 +33,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
     def Statement = rule { 
          "<" ~ Term ~ Copula ~ Term ~ ">" |                             // two terms related to each other
-         Term  |                                                        // a term can name a statement
+         // Term  | // comments to avoid recursion issue                // a term can name a statement
          "(^" ~ Word ~ oneOrMore(Term).separatedBy(",") ~ ")"           // an operation to be executed 
     }
 
@@ -55,8 +55,8 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def Term:Rule0 = rule {
         Word         |                                                  // an atomic constant term
         Variable     |                                                  // an atomic variable term
-        CompoundTerm //|                                                // a term with internal structure
-        // Statement  // comments to avoid recursion issue              // a statement can serve as a term
+        CompoundTerm |                                                  // a term with internal structure
+        Statement                                                       // a statement can serve as a term
     }
 
     def CompoundTerm = rule {
@@ -104,7 +104,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def Word = rule {
-        oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n'\" "))                  // Anything apart from chars used in grammar
+        oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n'\""))                  // Anything apart from chars used in grammar
     }
 
     def Frequency = rule { Num }
