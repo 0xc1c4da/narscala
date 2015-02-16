@@ -55,14 +55,14 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def Term:Rule0 = rule {
         Word         |                                                  // an atomic constant term
         Variable     |                                                  // an atomic variable term
-        CompoundTerm |                                                  // a term with internal structure
-        Statement                                                       // a statement can serve as a term
+        CompoundTerm //|                                                // a term with internal structure
+        // Statement  // comments to avoid recursion issue              // a statement can serve as a term
     }
 
     def CompoundTerm = rule {
         "{" ~ oneOrMore(Term).separatedBy(",") ~ "}" |               // extensional set, NAL-2
         "[" ~ oneOrMore(Term).separatedBy(",") ~ "]" |               // intensional set, NAL-2
-        "(" ~ optional(Op) ~ optional(",") ~ oneOrMore(Term).separatedBy(Op) ~ ")"
+        "(" ~ optional(Op ~ ",") ~ oneOrMore(Term).separatedBy(Op) ~ ")"
     }
 
     def Op = rule {
@@ -78,7 +78,9 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         "&&"|                                                           // conjunction, NAL-5
         "&/"|                                                           // sequential events/conjunction, NAL-7
         "&|"|                                                           // parallel events/conjunciton, NAL-7
-        ","                                                             // seperator
+        "," |                                                           // seperator
+        " "
+
     }
 
     def Variable = rule {                                               
