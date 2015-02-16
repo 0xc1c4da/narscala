@@ -17,7 +17,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
     // Helper Rules
     implicit def wspStr(s: String): Rule0 = rule { str(s) ~ zeroOrMore(' ') }
-    def Flt = rule { Digits ~ Dec }
+    def Num = rule { Digits ~ optional(Dec) }
     def Digits = rule { oneOrMore(Digit) }
     def Dec = rule { str(".") ~ Digits }
 
@@ -100,8 +100,8 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         oneOrMore(noneOf("<>{}[]()&-~*/\\|:$%\n'\" "))                  // Anything apart from chars used in grammar
     }
 
-    def Frequency = rule { Flt }
-    def Confidence = rule { Flt }
-    def Priority = rule { Flt }
-    def Durability = rule { Flt }
+    def Frequency = rule { Num }
+    def Confidence = rule { Num }
+    def Priority = rule { Num }
+    def Durability = rule { Num }
 }
