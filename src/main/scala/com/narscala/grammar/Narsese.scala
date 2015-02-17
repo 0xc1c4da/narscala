@@ -45,18 +45,18 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def copula:Rule1[Int] = rule {
-            ("-->" | "→"  )  ~ push(Copula.INHERITANCE)              |              // inheritance, NAL-1
-            ("<->" | "↔"  )  ~ push(Copula.SIMILARITY)               |              // similarity, NAL-2
-            ("{--" | "◦→" )  ~ push(Copula.INSTANCE)                 |              // instance, NAL-2
-            ("--]" | "→◦" )  ~ push(Copula.PROPERTY)                 |              // property, NAL-2
-            ("{-]" | "◦→◦")  ~ push(Copula.INSTANCE_PROPERTY)        |              // instance-property, NAL-2
-            ("==>" | "⇒"  )  ~ push(Copula.IMPLICATION)              |              // implication, NAL-5
-            ("<=>" | "⇔"  )  ~ push(Copula.EQUIVALENCE)              |              // equivalence, NAL-5
-            ("=/>" | "/⇒" )  ~ push(Copula.PREDICTIVE_IMPLICATION)   |              // predictive implication, NAL-7
-            ("=|>" | "|⇒" )  ~ push(Copula.CONCURRENT_IMPLICATION)   |              // concurrent implication, NAL-7
-            ("=\\>"| "\\⇒")  ~ push(Copula.RETROSPECTIVE_IMPLICATION)|              // retrospective implication, NAL-7
-            ("</>" | "/⇔" )  ~ push(Copula.PREDICTIVE_EQUIVALENCE)   |              // predictive equivalence, NAL-7
-            ("<|>" | "|⇔" )  ~ push(Copula.CONCURRENT_EQUIVALENCE)                  // concurrent equivalence, NAL-7
+        ("-->" | "→"  )  ~ push(Copula.INHERITANCE)              |                  // inheritance, NAL-1
+        ("<->" | "↔"  )  ~ push(Copula.SIMILARITY)               |                  // similarity, NAL-2
+        ("{--" | "◦→" )  ~ push(Copula.INSTANCE)                 |                  // instance, NAL-2
+        ("--]" | "→◦" )  ~ push(Copula.PROPERTY)                 |                  // property, NAL-2
+        ("{-]" | "◦→◦")  ~ push(Copula.INSTANCE_PROPERTY)        |                  // instance-property, NAL-2
+        ("==>" | "⇒"  )  ~ push(Copula.IMPLICATION)              |                  // implication, NAL-5
+        ("<=>" | "⇔"  )  ~ push(Copula.EQUIVALENCE)              |                  // equivalence, NAL-5
+        ("=/>" | "/⇒" )  ~ push(Copula.PREDICTIVE_IMPLICATION)   |                  // predictive implication, NAL-7
+        ("=|>" | "|⇒" )  ~ push(Copula.CONCURRENT_IMPLICATION)   |                  // concurrent implication, NAL-7
+        ("=\\>"| "\\⇒")  ~ push(Copula.RETROSPECTIVE_IMPLICATION)|                  // retrospective implication, NAL-7
+        ("</>" | "/⇔" )  ~ push(Copula.PREDICTIVE_EQUIVALENCE)   |                  // predictive equivalence, NAL-7
+        ("<|>" | "|⇔" )  ~ push(Copula.CONCURRENT_EQUIVALENCE)                      // concurrent equivalence, NAL-7
     }
 
     def term = rule {
