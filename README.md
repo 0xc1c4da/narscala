@@ -1,6 +1,8 @@
 # Narscala
 
-A Scala implementation of Dr. Pei Wang's Non-Axiomatic Reasoning System.
+A headless Scala implementation of Dr. Pei Wang's Non-Axiomatic Reasoning System.
+
+Narscala will be written in a declarative manner, with concurrency in mind.
 
 This implementation is primarily for my own learning & understanding of Non-Axiomatic Logic & NARS as a whole.
 
