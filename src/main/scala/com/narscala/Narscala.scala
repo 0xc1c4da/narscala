@@ -8,13 +8,13 @@ import sys.ShutdownHookThread
 import com.narscala.io.Input
 
 object Narscala extends App {
-	private val system = ActorSystem("system")
+    private val system = ActorSystem("system")
 
-	system.actorOf(Props[Input]) // UDP Input Server
+    system.actorOf(Props[Input]) // UDP Input Server
 
-	ShutdownHookThread {
-		println("Shutting Down...")
-		system.terminate()
-		Await.result(system.whenTerminated, Duration.Inf)
-	}
+    ShutdownHookThread {
+        println("Shutting Down...")
+        system.terminate()
+        Await.result(system.whenTerminated, Duration.Inf)
+    }
 }
