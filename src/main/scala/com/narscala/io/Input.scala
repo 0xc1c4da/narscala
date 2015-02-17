@@ -16,10 +16,8 @@ import org.parboiled2._
 
 import com.narscala.grammar.Narsese
 
+/** Actor for handling input Narsese over UDP */
 class Input() extends Actor with ActorLogging {
-    /*
-    Actor for handling input tasks over UDP
-    */
     import context.system
 
     val config = ConfigFactory.load()

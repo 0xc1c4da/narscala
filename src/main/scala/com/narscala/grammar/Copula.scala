@@ -1,10 +1,12 @@
 package com.narscala.grammar
 
+/** Describes the Relation between Terms in;
+  * NAL-1, NAL-2, NAL-5 & NAL-7
+  *
+  * Can use mathematical notation in book or OpenNARS syntax
+  * Internally represented as Int
+  */
 object Copula { 
-    /*
-        Describes the Relation between Terms in;
-        NAL-1, NAL-2, NAL-5 & NAL-7
-    */
 
     val INHERITANCE                 = 0  // --> , →   , NAL-1
     val SIMILARITY                  = 1  // <-> , ↔   , NAL-2

@@ -1,6 +1,8 @@
 package com.narscala
 
 import akka.actor._
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import sys.ShutdownHookThread
 
 import com.narscala.io.Input
@@ -12,7 +14,7 @@ object Narscala extends App {
 
 	ShutdownHookThread {
 		println("Shutting Down...")
-		system.shutdown()
-		system.awaitTermination()
+		system.terminate()
+		Await.result(system.whenTerminated, Duration.Inf)
 	}
 }
