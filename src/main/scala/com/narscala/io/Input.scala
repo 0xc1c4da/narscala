@@ -45,7 +45,10 @@ class Input() extends Actor with ActorLogging {
             // }
             val parser = new Narsese(data.decodeString("UTF-8"))
             val result = parser.InputLine.run() match {
-                  case Success(_) => "valid"
+                  case Success(ast) => {
+                    println(ast)
+                    "valid"
+                  }
                   case Failure(e: ParseError) => parser.formatError(e)
                   case Failure(e)             => "unexpected error: " + e
                 }
