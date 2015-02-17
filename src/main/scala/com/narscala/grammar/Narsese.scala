@@ -33,8 +33,8 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
     def sentence:Rule1[Sentence] = rule {                                               
         statement ~ "." ~ optional(tense) ~ optional(truth) ~> Judgement |          // judgment to be remembered, NAL-8
-        statement ~ "?" ~ optional(tense) ~> Question |                             // question to be answered, NAL-8
-        statement ~ "@" ~ optional(tense) ~> Desire |                               // question on desire value to be answered, NAL-8
+        statement ~ "?" ~ optional(tense) ~> Question                    |          // question to be answered, NAL-8
+        statement ~ "@" ~ optional(tense) ~> Desire                      |          // question on desire value to be answered, NAL-8
         statement ~ "!" ~ optional(truth) ~> Goal                                   // goal to be realized, NAL-8
     }
 
@@ -62,7 +62,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def term = rule {
         compoundterm |                                                              // a term with internal structure
         statement    |                                                              // a statement can serve as a term
-        variable  |                                                                 // an atomic variable term
+        variable     |                                                              // an atomic variable term
         word                                                                        // an atomic constant term
     }
 
@@ -89,7 +89,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
     def variable:Rule1[Variable] = rule {                                               
         "$" ~ word ~> IndependentVariable |                                         // independent variable / variable in judgment(?), NAL-6
-        "#" ~ word ~> DependentVariable |                                           // dependent variable, operator(?), NAL-8
+        "#" ~ word ~> DependentVariable   |                                         // dependent variable, operator(?), NAL-8
         "?" ~ word ~> QueryVariable                                                 // query variable in question, NAL-6
     }
 
