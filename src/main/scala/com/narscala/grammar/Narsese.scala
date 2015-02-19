@@ -109,7 +109,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def word:Rule1[Word] = rule {                                                   // unicode string in an arbitrary alphabet
-        capture(oneOrMore(noneOf("<>{}[]()&-~*/\\|:;$%\n'\", ∩∪-⊖×¬∨∧⇒→↔◦⇔"))) ~> Word
+        capture(oneOrMore(noneOf("<>{}[]()&-~*/\\|:;$%\r\n'\",\s\t∩∪-⊖×¬∨∧⇒→↔◦⇔"))) ~> Word
     }
 
     def frequency :Rule1[Double] = rule { num }
