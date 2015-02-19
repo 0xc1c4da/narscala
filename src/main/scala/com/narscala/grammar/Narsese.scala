@@ -1,5 +1,6 @@
 package com.narscala.grammar
 
+import scala.language.implicitConversions
 import org.parboiled2._
 
 /** Narsese Parser that attempts to reflect;
@@ -41,22 +42,22 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     def statement:Rule1[Statement] = rule { 
          "<" ~ term ~ copula ~ term ~ ">" ~> RelationalStatement |                  // two terms related to each other
          // term  | // commented to avoid recursion issue                           // a term can name a statement
-         "(^" ~ word ~ oneOrMore(term).separatedBy(",") ~ ")" ~> OperationStatement // an operation to be executed 
+         "(^" ~ word ~ "," ~ oneOrMore(term).separatedBy(",") ~ ")" ~> OperationStatement // an operation to be executed 
     }
 
-    def copula:Rule1[Int] = rule {
-        ("-->" | "→"  )  ~ push(Copula.INHERITANCE)              |                  // inheritance, NAL-1
-        ("<->" | "↔"  )  ~ push(Copula.SIMILARITY)               |                  // similarity, NAL-2
-        ("{--" | "◦→" )  ~ push(Copula.INSTANCE)                 |                  // instance, NAL-2
-        ("--]" | "→◦" )  ~ push(Copula.PROPERTY)                 |                  // property, NAL-2
-        ("{-]" | "◦→◦")  ~ push(Copula.INSTANCE_PROPERTY)        |                  // instance-property, NAL-2
-        ("==>" | "⇒"  )  ~ push(Copula.IMPLICATION)              |                  // implication, NAL-5
-        ("<=>" | "⇔"  )  ~ push(Copula.EQUIVALENCE)              |                  // equivalence, NAL-5
-        ("=/>" | "/⇒" )  ~ push(Copula.PREDICTIVE_IMPLICATION)   |                  // predictive implication, NAL-7
-        ("=|>" | "|⇒" )  ~ push(Copula.CONCURRENT_IMPLICATION)   |                  // concurrent implication, NAL-7
-        ("=\\>"| "\\⇒")  ~ push(Copula.RETROSPECTIVE_IMPLICATION)|                  // retrospective implication, NAL-7
-        ("</>" | "/⇔" )  ~ push(Copula.PREDICTIVE_EQUIVALENCE)   |                  // predictive equivalence, NAL-7
-        ("<|>" | "|⇔" )  ~ push(Copula.CONCURRENT_EQUIVALENCE)                      // concurrent equivalence, NAL-7
+    def copula:Rule1[Copula] = rule {
+        ("-->" | "→"  )  ~> Inheritance             |                               // inheritance, NAL-1
+        ("<->" | "↔"  )  ~> Similarity              |                               // similarity, NAL-2
+        ("{--" | "◦→" )  ~> Instance                |                               // instance, NAL-2
+        ("--]" | "→◦" )  ~> Property                |                               // property, NAL-2
+        ("{-]" | "◦→◦")  ~> InstanceProperty        |                               // instance-property, NAL-2
+        ("==>" | "⇒"  )  ~> Implication             |                               // implication, NAL-5
+        ("<=>" | "⇔"  )  ~> Equivalence             |                               // equivalence, NAL-5
+        ("=/>" | "/⇒" )  ~> PredictiveImplication   |                               // predictive implication, NAL-7
+        ("=|>" | "|⇒" )  ~> ConcurrentImplication   |                               // concurrent implication, NAL-7
+        ("=\\>"| "\\⇒")  ~> RetrospectiveImplication|                               // retrospective implication, NAL-7
+        ("</>" | "/⇔" )  ~> PredictiveEquivalence   |                               // predictive equivalence, NAL-7
+        ("<|>" | "|⇔" )  ~> ConcurrentEquivalence                                   // concurrent equivalence, NAL-7
     }
 
     def term = rule {
@@ -72,19 +73,19 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         "(" ~ termconnector ~ "," ~ oneOrMore(term).separatedBy(",") ~ ")" ~> ConnectedSet // See termconnector
     }
 
-    def termconnector:Rule1[Int] = rule {                                           // Term Connectors
-        ("|"  | "∪" ) ~ push(TermConnector.INTENSIONAL_INTERSECTION)|               // intensional intersection, NAL-3
-        "-"           ~ push(TermConnector.EXTENSIONAL_DIFFERENCE)  |               // extensional difference, NAL-3
-        ("~"  | "⊖" ) ~ push(TermConnector.INTENSIONAL_DIFFERENCE)  |               // intensional difference, NAL-3
-        ("*"  | "×" ) ~ push(TermConnector.PRODUCT)                 |               // product, NAL-4
-        "/"           ~ push(TermConnector.EXTENSIONAL_IMAGE)       |               // extensional image, NAL-4
-        "\\"          ~ push(TermConnector.INTENSIONAL_IMAGE)       |               // intensional image, NAL-4
-        ("--" | "¬")  ~ push(TermConnector.NEGATION)                |               // negation, NAL-5
-        ("||" | "∨")  ~ push(TermConnector.DISJUNCTION)             |               // disjunction, NAL-5
-        ("&&" | "∧")  ~ push(TermConnector.CONJUNCTION)             |               // conjunction, NAL-5
-        ("&/" | ",")  ~ push(TermConnector.SEQUENTIAL_CONJUNCTION)  |               // sequential events/conjunction, NAL-7
-        ("&|" | ";")  ~ push(TermConnector.PARALLEL_CONJUNCTION)    |               // parallel events/conjunciton, NAL-7
-        ("&"  | "∩" ) ~ push(TermConnector.EXTENSIONAL_INTERSECTION)                // extensional intersection, NAL-3
+    def termconnector:Rule1[TermConnector] = rule {                                 // Term Connectors
+        ("|"  | "∪" ) ~> IntensionalIntersection|                                   // intensional intersection, NAL-3
+        ("-"  | "-" ) ~> ExtensionalDifference  |                                   // extensional difference, NAL-3
+        ("~"  | "⊖" ) ~> IntensionalDifference  |                                   // intensional difference, NAL-3
+        ("*"  | "×" ) ~> Product                |                                   // product, NAL-4
+        ("/"  | "/" ) ~> ExtensionalImage       |                                   // extensional image, NAL-4
+        ("\\" | "\\") ~> IntensionalImage       |                                   // intensional image, NAL-4
+        ("--" | "¬" ) ~> Negation               |                                   // negation, NAL-5
+        ("||" | "∨" ) ~> Disjunction            |                                   // disjunction, NAL-5
+        ("&&" | "∧" ) ~> Conjunction            |                                   // conjunction, NAL-5
+        ("&/" | "," ) ~> SequentialConjunction  |                                   // sequential events/conjunction, NAL-7
+        ("&|" | ";" ) ~> ParallelConjunction    |                                   // parallel events/conjunciton, NAL-7
+        ("&"  | "∩" ) ~> ExtensionalIntersection                                    // extensional intersection, NAL-3
     }
 
     def variable:Rule1[Variable] = rule {                                               
@@ -93,10 +94,10 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         "?" ~ word ~> QueryVariable                                                 // query variable in question, NAL-6
     }
 
-    def tense:Rule1[Int] = rule {
-        (":/:" | "/⇒" ) ~ push(Tense.FUTURE)  |                                     // future event, NAL-7
-        (":|:" | "|⇒" ) ~ push(Tense.PRESENT) |                                     // present event, NAL-7
-        (":\\:"| "\\⇒") ~ push(Tense.PAST)                                          // past event, NAL-7
+    def tense:Rule1[Tense] = rule {
+        (":/:" | "/⇒" ) ~> Future  |                                                // future event, NAL-7
+        (":|:" | "|⇒" ) ~> Present |                                                // present event, NAL-7
+        (":\\:"| "\\⇒") ~> Past                                                     // past event, NAL-7
     }
 
     def truth = rule {                                                              // two numbers in [0,1]x(0,1)

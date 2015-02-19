@@ -4,6 +4,4 @@ package com.narscala.grammar
   * 
   * A unicode string in an arbitrary alphabet
   */
-case class Word(label : String) extends Term {
-
-}
+case class Word(label : String) extends Term

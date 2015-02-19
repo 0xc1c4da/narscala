@@ -35,12 +35,6 @@ class Input() extends Actor with ActorLogging {
         case Udp.Received(data, remote) =>
             log.debug(data.decodeString("UTF-8"))
 
-            // val parser = new Narsese()
-            // val parsed = parser.parseAll(parser.task, data.decodeString("UTF-8")) match {
-            //     case parser.Success(result, _) => result
-            //     case parser.NoSuccess(_,_) => "nosuccess"
-            //     case parser.Error(_, _) => "turtle"
-            // }
             val parser = new Narsese(data.decodeString("UTF-8"))
             val result = parser.InputLine.run() match {
                   case Success(ast) => {
