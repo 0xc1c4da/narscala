@@ -41,7 +41,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
     def statement:Rule1[Statement] = rule { 
          "<" ~ term ~ copula ~ term ~ ">" ~> RelationalStatement |                  // two terms related to each other
-         // term  | // commented to avoid recursion issue                           // a term can name a statement
+         // term  ~> TermStatement | // commented to avoid recursion issue                           // a term can name a statement
          "(^" ~ word ~ "," ~ oneOrMore(term).separatedBy(",") ~ ")" ~> OperationStatement // an operation to be executed 
     }
 
