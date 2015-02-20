@@ -14,7 +14,7 @@ import org.parboiled2._
   * - NARS 1.6.3 Draft Format (to a lesser extent)
   *     https://docs.google.com/spreadsheets/d/1qrf1c82WXc6c6sYzBrij735r9aTNI-awNVH-te-4ShI/
   *
-  * TODO: Fix Recursion on term in statement
+  * TODO: TermConnector mixins for shorthand 1.6.3 narsese (discuss order of operations)
   */
 class Narsese(val input: ParserInput) extends Parser with StringBuilding {
 
@@ -33,10 +33,10 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }    
 
     def sentence:Rule1[Sentence] = rule {                                               
-        statement ~ "." ~ optional(tense) ~ optional(truth) ~> Judgement |          // judgment to be remembered, NAL-8
-        statement ~ "?" ~ optional(tense) ~> Question                    |          // question to be answered, NAL-8
-        statement ~ "@" ~ optional(tense) ~> Desire                      |          // question on desire value to be answered, NAL-8
-        statement ~ "!" ~ optional(truth) ~> Goal                                   // goal to be realized, NAL-8
+        term ~ "." ~ optional(tense) ~ optional(truth) ~> Judgement |          // judgment to be remembered, NAL-8
+        term ~ "?" ~ optional(tense) ~> Question                    |          // question to be answered, NAL-8
+        term ~ "@" ~ optional(tense) ~> Desire                      |          // question on desire value to be answered, NAL-8
+        term ~ "!" ~ optional(truth) ~> Goal                                   // goal to be realized, NAL-8
     }
 
     def statement:Rule1[Statement] = rule { 
@@ -46,11 +46,11 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def copula:Rule1[Copula] = rule {
-        ("-->" | "→"  )  ~> Inheritance             |                               // inheritance, NAL-1
         ("<->" | "↔"  )  ~> Similarity              |                               // similarity, NAL-2
+        ("{-]" | "◦→◦")  ~> InstanceProperty        |                               // instance-property, NAL-2
         ("{--" | "◦→" )  ~> Instance                |                               // instance, NAL-2
         ("--]" | "→◦" )  ~> Property                |                               // property, NAL-2
-        ("{-]" | "◦→◦")  ~> InstanceProperty        |                               // instance-property, NAL-2
+        ("-->" | "→"  )  ~> Inheritance             |                               // inheritance, NAL-1
         ("==>" | "⇒"  )  ~> Implication             |                               // implication, NAL-5
         ("<=>" | "⇔"  )  ~> Equivalence             |                               // equivalence, NAL-5
         ("=/>" | "/⇒" )  ~> PredictiveImplication   |                               // predictive implication, NAL-7
@@ -74,14 +74,14 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def termconnector:Rule1[TermConnector] = rule {                                 // Term Connectors
+        ("||" | "∨" ) ~> Disjunction            |                                   // disjunction, NAL-5
         ("|"  | "∪" ) ~> IntensionalIntersection|                                   // intensional intersection, NAL-3
+        ("--" | "¬" ) ~> Negation               |                                   // negation, NAL-5
         ("-"  | "-" ) ~> ExtensionalDifference  |                                   // extensional difference, NAL-3
         ("~"  | "⊖" ) ~> IntensionalDifference  |                                   // intensional difference, NAL-3
         ("*"  | "×" ) ~> Product                |                                   // product, NAL-4
         ("/"  | "/" ) ~> ExtensionalImage       |                                   // extensional image, NAL-4
         ("\\" | "\\") ~> IntensionalImage       |                                   // intensional image, NAL-4
-        ("--" | "¬" ) ~> Negation               |                                   // negation, NAL-5
-        ("||" | "∨" ) ~> Disjunction            |                                   // disjunction, NAL-5
         ("&&" | "∧" ) ~> Conjunction            |                                   // conjunction, NAL-5
         ("&/" | "," ) ~> SequentialConjunction  |                                   // sequential events/conjunction, NAL-7
         ("&|" | ";" ) ~> ParallelConjunction    |                                   // parallel events/conjunciton, NAL-7
@@ -109,7 +109,7 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
     }
 
     def word:Rule1[Word] = rule {                                                   // unicode string in an arbitrary alphabet
-        capture(oneOrMore(noneOf("<>{}[]()&-~*/\\|:;$%\r\n'\",\s\t∩∪-⊖×¬∨∧⇒→↔◦⇔"))) ~> Word
+        capture(oneOrMore(noneOf("<>{}[]()&~*/\\|:;$%\r\n'\", \t∩∪⊖×¬∨∧⇒→↔◦⇔"))) ~> Word
     }
 
     def frequency :Rule1[Double] = rule { num }
