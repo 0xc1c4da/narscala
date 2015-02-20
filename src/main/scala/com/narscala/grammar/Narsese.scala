@@ -32,16 +32,16 @@ class Narsese(val input: ParserInput) extends Parser with StringBuilding {
         optional(budget) ~ sentence ~ optional("\n") ~> Task
     }    
 
-    def sentence:Rule1[Sentence] = rule {                                               
-        term ~ "." ~ optional(tense) ~ optional(truth) ~> Judgement |          // judgment to be remembered, NAL-8
-        term ~ "?" ~ optional(tense) ~> Question                    |          // question to be answered, NAL-8
-        term ~ "@" ~ optional(tense) ~> Desire                      |          // question on desire value to be answered, NAL-8
-        term ~ "!" ~ optional(truth) ~> Goal                                   // goal to be realized, NAL-8
+    def sentence:Rule1[Sentence] = rule {                                           // changed statement to term to fix recursion    
+        term ~ "." ~ optional(tense) ~ optional(truth) ~> Judgement |               // judgment to be remembered, NAL-8
+        term ~ "?" ~ optional(tense) ~> Question                    |               // question to be answered, NAL-8
+        term ~ "@" ~ optional(tense) ~> Desire                      |               // question on desire value to be answered, NAL-8
+        term ~ "!" ~ optional(truth) ~> Goal                                        // goal to be realized, NAL-8
     }
 
     def statement:Rule1[Statement] = rule { 
          "<" ~ term ~ copula ~ term ~ ">" ~> RelationalStatement |                  // two terms related to each other
-         // term  ~> TermStatement | // commented to avoid recursion issue                           // a term can name a statement
+         // term  ~> TermStatement | // commented to avoid recursion issue          // a term can name a statement
          "(^" ~ word ~ "," ~ oneOrMore(term).separatedBy(",") ~ ")" ~> OperationStatement // an operation to be executed 
     }
 
