@@ -184,6 +184,7 @@ class NarseseSpec extends Specification {
         }
 
         // Test Copulas
+
         "<bird <-> swimmer>." in {
             parse("<bird <-> swimmer>.") ===
             Vector(Task(None,Judgement(RelationalStatement(Word("bird"),Similarity(),Word("swimmer")),None,None)))
@@ -300,6 +301,8 @@ class NarseseSpec extends Specification {
             parse("<bird |⇔ swimmer>.") ===
             Vector(Task(None,Judgement(RelationalStatement(Word("bird"),ConcurrentEquivalence(),Word("swimmer")),None,None)))
         }
+
+        //
 
         "(^go-to,{switch0}). :|: %1.00;0.90%" in {
             parse("(^go-to,{switch0}). :|: %1.00;0.90%") ===
