@@ -9,23 +9,23 @@ import akka.actor.Props
 import akka.actor.actorRef2Scala
 import akka.util.ByteString
 import akka.io._
-import com.typesafe.config.ConfigFactory
 
 import scala.util.{ Success, Failure }
 import org.parboiled2._
 
+import com.narscala.Narscala
 import com.narscala.grammar.Narsese
 
-/** Actor for handling input Narsese over UDP \
-  * TODO: Singleton ConfigFactory
-*/
-class Input() extends Actor with ActorLogging {
+/** Actor for handling input Narsese over UDP
+  * 
+  * Narsese comes in packet over string, is parsed
+  * TODO: and will be sent to Reasoner.
+  */
+class Input() extends Actor {
     import context.system
 
-    val config = ConfigFactory.load()
-
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress(
-        config.getString("narscala.io.address"), config.getInt("narscala.io.port")
+        Narscala.config.getString("narscala.io.address"), Narscala.config.getInt("narscala.io.port")
     ))
  
     def receive = {
@@ -35,7 +35,7 @@ class Input() extends Actor with ActorLogging {
  
     def ready(socket: ActorRef): Receive = {
         case Udp.Received(data, remote) =>
-            log.debug(data.decodeString("UTF-8"))
+            // log.debug(data.decodeString("UTF-8"))
 
             val parser = new Narsese(data.decodeString("UTF-8"))
             val result = parser.InputLine.run() match {

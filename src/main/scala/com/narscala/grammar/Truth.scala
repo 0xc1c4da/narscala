@@ -1,13 +1,13 @@
 package com.narscala.grammar
 
-import com.typesafe.config.ConfigFactory
-import org.parboiled2._
+import com.narscala.Narscala
 
 // TODO: TruthFactory, minimize memory usage of Truth values
 
+
 object TruthDefaults {
-    lazy val frequency:  Double = ConfigFactory.load().getDouble("narscala.defaults.frequency")
-    lazy val confidence: Double = ConfigFactory.load().getDouble("narscala.defaults.confidence")
+    val frequency:  Double = Narscala.config.getDouble("narscala.defaults.frequency")
+    val confidence: Double = Narscala.config.getDouble("narscala.defaults.confidence")
 }
 
 case class Truth(   frequency:  Double = TruthDefaults.frequency,

@@ -14,6 +14,8 @@ import org.parboiled2._
   * - NARS 1.6.3 Draft Format (to a lesser extent)
   *     https://docs.google.com/spreadsheets/d/1qrf1c82WXc6c6sYzBrij735r9aTNI-awNVH-te-4ShI/
   *
+  * See package com.narscala.logic for related objects (as defined by NAL-n)
+  *
   * TODO: TermConnector mixins for shorthand 1.6.3 narsese (discuss order of operations)
   */
 class Narsese(val input: ParserInput) extends Parser with StringBuilding {

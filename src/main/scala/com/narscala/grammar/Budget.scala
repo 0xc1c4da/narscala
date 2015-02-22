@@ -1,13 +1,12 @@
 package com.narscala.grammar
 
-import com.typesafe.config.ConfigFactory
-import org.parboiled2._
+import com.narscala.Narscala
 
 // TODO: BudgetFactory, minimize memory usage of Budget values, OpenNARS memory is 10% Budget Values
 
 object BudgetDefaults {
-    lazy val priority:   Double = ConfigFactory.load().getDouble("narscala.defaults.priority")
-    lazy val durability: Double = ConfigFactory.load().getDouble("narscala.defaults.durability")
+    lazy val priority:   Double = Narscala.config.getDouble("narscala.defaults.priority")
+    lazy val durability: Double = Narscala.config.getDouble("narscala.defaults.durability")
 }
 
 case class Budget(  priority:   Double = BudgetDefaults.priority,
