@@ -1,0 +1,18 @@
+package com.narscala.logic.inference
+ 
+import com.narscala.logic.grammar.*;
+ 
+rule "Revision"
+salience 0
+    when
+        $a : Judgement( ) // or Goal
+        $b : Judgement ( this != $a ) // or Goal
+
+        $aterm : Term ( this == $bterm )
+        $bterm : Term ( this == $aterm )
+
+        not $aterm : DependentVariable ()
+        not $bterm : DependentVariable ()
+    then
+        insert( new Judgement($aterm, None, TruthValue.revision($a.truth, $b.truth) )
+end

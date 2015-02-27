@@ -13,8 +13,8 @@ import akka.io._
 import scala.util.{ Success, Failure }
 import org.parboiled2._
 
-import com.narscala.Narscala
-import com.narscala.grammar.Narsese
+import com.narscala.Defaults
+import com.narscala.logic.grammar.Narsese
 
 /** Actor for handling input Narsese over UDP
   * 
@@ -25,7 +25,7 @@ class Input() extends Actor {
     import context.system
 
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress(
-        Narscala.config.getString("narscala.io.address"), Narscala.config.getInt("narscala.io.port")
+        Defaults.config.getString("narscala.io.address"), Defaults.config.getInt("narscala.io.port")
     ))
  
     def receive = {
