@@ -1,18 +1,14 @@
 package com.narscala.logic.inference
- 
+
 import com.narscala.logic.grammar.*;
+import com.narscala.logic.semantics.TruthValue;
  
-rule "Revision"
+rule "Revision - Judgement"
 salience 0
     when
-        $a : Judgement( ) // or Goal
-        $b : Judgement ( this != $a ) // or Goal
-
-        $aterm : Term ( this == $bterm )
-        $bterm : Term ( this == $aterm )
-
-        not $aterm : DependentVariable ()
-        not $bterm : DependentVariable ()
+        $a          : Judgement ( ) // TODO: Goal
+        $b          : Judgement ( this != $a ) // TODO: Goal
+        $aterm      : Term ( this == $a.term && this == $b.term )
     then
-        insert( new Judgement($aterm, None, TruthValue.revision($a.truth, $b.truth) )
+        // insert( new Judgement($aterm, scala.None$.MODULE$, TruthValue.revision($a.truth, $b.truth) ) );
 end
