@@ -21,12 +21,17 @@ class EngineSpec extends Specification {
          * // Bird is very likely to be a type of swimmer.
          */
         "Revision" in {
-            val tasks = Vector(
-                Task(None,Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,None)),
-                Task(None,Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,Some(Truth(0.1,Some(0.6)))))
+            // val facts = Vector(
+            //     Task(None,Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,Some(Truth(1.0,Some(0.9))))),
+            //     Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,Some(Truth(0.1,Some(0.6))))
+            // )
+
+            val sentences = Vector(
+                Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,Some(Truth(1.0))),
+                Judgement(RelationalStatement(Word("bird"),Inheritance(),Word("swimmer")),None,Some(Truth(0.1,Some(0.6))))
             )
 
-            val sentences = tasks.map( task => task.sentence )
+            // val sentences = tasks.map( task => task.sentence )
 
             println(Engine.run(sentences))
             true

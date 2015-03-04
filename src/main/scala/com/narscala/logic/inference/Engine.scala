@@ -2,30 +2,21 @@ package com.narscala.logic.inference
 
 import com.narscala.logic.grammar._
 
-import org.kie.api.KieServices
-import org.kie.api.runtime.{StatelessKieSession, KieContainer}
+import com.narscala.logic.inference.engine.RuleEngine
+import com.narscala.logic.inference.engine.WorkingMemory
 
-import java.util.ArrayList
-import scala.collection.JavaConversions.iterableAsScalaIterable
 
 object Engine {
-    private lazy val kieServices: KieServices = KieServices.Factory.get()
-    private lazy val kContainer: KieContainer = kieServices.getKieClasspathContainer
+    val re = RuleEngine(NAL1.rules)
 
-    // def newStatelessSession: StatelessKieSession = kContainer.newStatelessKieSession()
-    // def executeStateless(facts: List[Any]) = newStatelessSession.execute(facts)
-    def newSession = kContainer.newKieSession()
+    def run(facts: Vector[Sentence]) = {
 
-    def run(tasks: Vector[Sentence]): Vector[Sentence] = {
-        val mutableState = new ArrayList[Sentence]
-        val session = newSession
+        val workingMemory = WorkingMemory(facts.toList)
+        
+        re.execOn(workingMemory)
 
-        session.setGlobal("mutableState", mutableState)
-        tasks map session.insert
+        println("result is")
+        println(workingMemory.all(classOf[Judgement]))
 
-        session.fireAllRules()
-        session.dispose()
-
-        mutableState.toVector
     }
 }

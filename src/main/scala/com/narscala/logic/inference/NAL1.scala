@@ -1,20 +1,16 @@
-// package com.narscala.logic.inference
+package com.narscala.logic.inference
 
-// import scala.language.reflectiveCalls
-// import hammurabi.Rule._
+import scala.language.reflectiveCalls
+import com.narscala.logic.inference.engine.Rule._
 
-// import com.narscala.logic.grammar._
-// import com.narscala.logic.semantics.TruthValue
+import com.narscala.logic.grammar._
+import com.narscala.logic.semantics.TruthValue
 
-// object NAL1 {
+object NAL1 {
 
-//     def contains(_) {
+    val rules = Set(
 
-//     }
-
-//     val rules = Set(
-
-        /*  Revision. Appendix B, 1.1
+        /* Revision. Appendix B, 1.1
         * When the task is a judgment and contains neither tense nor dependent variable,
         * the system matches it with the existing judgments on the same statement.
 
@@ -38,18 +34,21 @@
         * tense is something relative which depends on the current time.
         * for example an event will be "future" if its occurenceTime is bigger than memory.time()
         */
-//         rule ("Revision") let {
-//             val a = any(kindOf[Judgement])
-//             val b = any(kindOf[Judgement])
-//             when {
-//                 // (a.tense equals None) and
-//                 (a.term not contains (typeOf[DependentVariable])) and
-//                 (a.term equals b.term)
-//             } then {
-//                 produce(
-//                     Judgement(a.term, None, TruthValue.revision(a.truth, b.truth) )
-//                 )
-//             }
-//         }
-//     )
-// }
+
+        rule ("Revision") let {
+            val a = any(kindOf[Judgement]) // TODO: or Goal
+            val b = any(kindOf[Judgement])
+
+            when {
+                (a.truth != b.truth) and (a.term == b.term)
+                // TODO: and neither term is DependentVariable, recursively?
+            } perform {
+                // TODO: produce puts judgement into WorkingMemory and gets processed, causing infinite loop
+                produce(
+                    Judgement( a.term, None, Some(TruthValue.revision(a.truth.get, b.truth.get)) )
+                )
+                
+            }
+        }
+    )
+}
