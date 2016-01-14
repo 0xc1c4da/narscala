@@ -1,6 +1,6 @@
 # Narscala
 
-## Deprecated in favour of [Narjure](https://github.com/jarradh/narscala)
+## Deprecated in favour of [Narjure](https://github.com/jarradh/narjure)
 
 A headless Scala implementation of Dr. Pei Wang's Non-Axiomatic Reasoning System.
 
