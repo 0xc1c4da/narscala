@@ -1,5 +1,7 @@
 # Narscala
 
+## Deprecated in favour of [Narjure](https://github.com/jarradh/narscala)
+
 A headless Scala implementation of Dr. Pei Wang's Non-Axiomatic Reasoning System.
 
 Narscala will be written in a declarative manner, with concurrency in mind.
